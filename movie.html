@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Booking Website</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(45deg, #f50000, #ee0000);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Search Bar Styles */
+        .search-container {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+        }
+
+        .search-bar {
+            width: 80%;
+            max-width: 600px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: rgb(255, 255, 255);
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Navigation Styles */
+        .nav-links {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(45deg, #ee0000, #ee0000);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Movie Grid Styles */
+        .movies {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .movie {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .movie:hover {
+            transform: translateY(-10px);
+        }
+
+        .movie img {
+            width: 100%;
+            height: 375px;
+            object-fit: cover;
+        }
+
+        .movie-info {
+            padding: 20px;
+        }
+
+        .movie h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .movie-rating {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .movie-buttons {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+        }
+
+        .movie-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .book-btn {
+            background: linear-gradient(45deg, #292b29, #d7dfd7);
+            color: white;
+        }
+
+        .trailer-btn {
+            background: linear-gradient(45deg, #eb3a0ee0, #f57c00);
+            color: white;
+        }
+
+        /* Booking Section Styles */
+        .booking-section {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Seat Selection Styles */
+        .seat-layout {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .seat {
+            aspect-ratio: 1;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .seat:hover {
+            background: #e8f5e9;
+        }
+
+        .seat.selected {
+            background:#ee0000;
+            border-color: #ee0000;
+        }
+
+        .seat.occupied {
+            background: #f44336;
+            cursor: not-allowed;
+        }
+
+        /* Confirmation Section Styles */
+        .confirmation {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .confirmation h3 {
+            color: #bd430e;
+            margin-bottom: 20px;
+        }
+
+        /* Trailer Modal Styles */
+        .trailer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .trailer-content {
+            width: 80%;
+            max-width: 900px;
+            position: relative;
+        }
+
+        .close-trailer {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        /* Timing Button Styles */
+        .timing-btn {
+            padding: 8px 16px;
+            margin: 5px;
+            border: 2px solid #ff0000;
+            border-radius: 20px;
+            background: white;
+            color: #ff0000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timing-btn.selected {
+            background: #ff0000;
+            color: white;
+        }
+
+        /* Back Button Styles */
+        .back-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #ff0000, #ff0000);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .back-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(121, 13, 157, 0.3);
+        }
+
+        .back-btn:hover:before {
+            left: 100%;
+        }
+
+        .back-btn:active {
+            transform: translateY(1px);
+        }
+
+        .back-btn i {
+            font-size: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .back-btn:hover i {
+            transform: translateX(-5px);
+        }
+
+        /* Button Group Styles */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .button-group .book-btn,
+        .button-group .back-btn {
+            flex: 1;
+            padding: 12px;
+        }
+        
+        .button-group .back-btn {
+            background: linear-gradient(45deg, #ff0000, #ff9a4d);
+            justify-content: center;
+        }
+
+        /* Discount Section Styles */
+        
+
+        .discount-message {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .movies {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                padding: 15px;
+            }
+
+            .search-bar {
+                width: 90%;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+            }
+
+            .nav-links a {
+                font-size: 14px;
+                padding: 6px 15px;
+            }
+        }
+
+        /* New styles for confirmation section */
+        .confirmation-content {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .confirmation-details {
+            margin-bottom: 20px;
+        }
+
+        .confirmation .back-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Movie Booking Website</h1>
+        <div class="search-container">
+            <input type="text" class="search-bar" placeholder="Search for movies..." onkeyup="searchMovies(this.value)">
+        </div>
+    </div>
+
+    <div class="nav-links">
+        <a href="#" onclick="filterMovies('all')" class="active">All Movies</a>
+        <a href="#" onclick="filterMovies('cartoon')">Cartoon</a>
+        <a href="#" onclick="filterMovies('tollywood')">Tollywood</a>
+        <a href="#" onclick="filterMovies('bollywood')">Bollywood</a>
+        <a href="#" onclick="filterMovies('hollywood')">Hollywood</a>
+    </div>
+
+    <div id="movies-container" class="movies">
+        <!-- Movies will be dynamically loaded here -->
+    </div>
+
+    <div id="booking-section" class="booking-section" style="display: none;">
+        <h2>Book Your Tickets</h2>
+        <div class="movie-details">
+            <h3 id="selected-movie-title"></h3>
+            <p>Price per ticket: ₹<span id="ticket-price"></span></p>
+        </div>
+        
+        <div class="show-timings">
+            <h4>Select Show Time</h4>
+            <div id="timings-container"></div>
+        </div>
+    
+        <div class="seat-selection">
+            <h4>Select Seats</h4>
+            <div class="seat-layout" id="seat-layout"></div>
+        </div>
+    
+        <div class="booking-summary">
+            <h4>Booking Summary</h4>
+            <p>Selected Seats: <span id="selected-seats"></span></p>
+            <p>Subtotal: ₹<span id="subtotal-amount"></span></p>
+            
+            <div class="discount-section">
+                <h4>Discount Details</h4>
+                <p id="bulk-discount-message" style="color: #4caf50; display: none;">
+                    10% bulk booking discount applied for booking more than 3 seats!
+                </p>
+            </div>
+
+            <p>Bulk Booking Discount: ₹<span id="bulk-discount-amount">0</span></p>
+            <p><strong>Final Amount: ₹<span id="total-amount"></span></strong></p>
+
+            <div class="button-group">
+                <button onclick="confirmBooking()" class="book-btn">Confirm Booking</button>
+                <button onclick="goBack('booking')" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Movies
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmation-section" class="confirmation" style="display: none;">
+        <div class="confirmation-content">
+            <h3>Booking Confirmed!</h3>
+            <div class="confirmation-details">
+                <p><strong>Movie:</strong> <span id="confirm-movie"></span></p>
+                <p><strong>Show Time:</strong> <span id="confirm-time"></span></p>
+                <p><strong>Seats:</strong> <span id="confirm-seats"></span></p>
+                <p><strong>Total Amount:</strong> ₹<span id="confirm-amount"></span></p>
+                <p class="success-message">Your tickets have been booked successfully!</p>
+            </div>
+            <div class="button-group">
+                <button onclick="goBack('confirmation')" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Movies
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="trailer-modal" class="trailer-modal">
+        <div class="trailer-content">
+            <span class="close-trailer" onclick="closeTrailer()">&times;</span>
+            <iframe id="trailer-frame" width="100%" height="500" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Movie Data
+        const movies = [
+             { id: 39, title: " Saripodhaa Sanivaaram", price: 300, category: "tollywood", rating: 4.7,
+                image: "https://www.cinejosh.com/newsimg/newsmainimg/saripodhaa-sanivaaram-in-ott-on-netflix_b_3008240813.jpg",
+                trailer: "https://www.youtube.com/embed/0_f1LzYjFI4", timings: ["11:00 AM", "3:00 PM", "7:00 PM"] },
+
+            { id: 12, title: "Game Changer", price: 270, category: "tollywood", rating: 4.3,
+                image: "https://cdn.gulte.com/wp-content/uploads/2024/09/game-changer-ram-charan.jpg",
+                trailer: "https://www.youtube.com/embed/QSu9-DBjMPI", timings: ["11:30 AM", "3:30 PM", "7:30 PM"] },
+                { id: 13, title: "Hanuman", price: 270, category: "tollywood", rating: 4.8,
+                image: "https://i.pinimg.com/736x/75/2d/29/752d29e9d9cb839a8fc8fb5acd064bad.jpg",
+                trailer: "https://www.youtube.com/embed/Oqvly3MvlXA", timings: ["10:30 AM", "2:30 PM", "6:30 PM"] },
+                { id: 14, title: "Pushpa 2: The Rule", price: 270, category: "tollywood", rating: 4.2,
+                image: "https://m.media-amazon.com/images/M/MV5BNGZlNTFlOWMtMzUwNC00ZDdhLTk0MWUtOGZjYzFlOTBmNDdhXkEyXkFqcGdeQXVyMTUyNjIwMDEw._V1_FMjpg_UX1000_.jpg",
+                trailer: "https://www.youtube.com/embed/g3JUbgOHgdw", timings: ["11:00 AM", "3:00 PM", "7:00 PM"] },
+                { id: 40, title: "Hi Nanna", price: 280, category: "tollywood", rating: 4.8,
+                image: "https://assets-in.bmscdn.com/iedb/movies/images/mobile/thumbnail/xlarge/hi-nanna-et00364503-1701678655.jpg",
+                trailer: "https://www.youtube.com/embed/v=3Ld05Om2UWs", timings: ["10:30 AM", "2:30 PM", "6:30 PM"] },
+                {id: 2,title: "RRR",price: 300,category: "tollywood", rating: 4.8,
+                image: "https://m.media-amazon.com/images/M/MV5BODUwNDNjYzctODUxNy00ZTA2LWIyYTEtMDc5Y2E5ZjBmNTMzXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_.jpg",
+                trailer: "https://www.youtube.com/embed/f_vbAtFSEc0",timings: ["11:00 AM", "3:00 PM", "7:00 PM"]},
+            {id: 15,title: "Kalki 2898 AD",price: 280,category: "tollywood",rating: 4.7,
+                image: "https://stat5.bollywoodhungama.in/wp-content/uploads/2021/07/Kalki-2898-AD-2.jpg",
+                trailer: "https://www.youtube.com/embed/aninoDcPWo4",timings: ["10:30 AM", "2:30 PM", "6:30 PM"]},
+            {id: 16, title: "Salaar",price: 290,category: "tollywood",rating: 4.5,
+                image: "https://m.media-amazon.com/images/I/71iYQyC96sL._AC_UF1000,1000_QL80_.jpg",
+                trailer: "https://www.youtube.com/embed/4GPvYMKtrtI",timings: ["11:00 AM", "3:00 PM", "7:00 PM"]},
+            {id: 17,title: "Guntur Kaaram",price: 270,category: "tollywood",rating: 4.3,
+                image: "https://upload.wikimedia.org/wikipedia/en/3/3e/Guntur_Kaaram_film_poster.jpg",
+                trailer: "https://www.youtube.com/embed/DYLG65xz55U",timings: ["10:00 AM", "2:00 PM", "6:00 PM"]},
+            {id: 3, title: "Pushpa: The Rise",price: 250,category: "tollywood",rating: 4.5,image: "https://m.media-amazon.com/images/M/MV5BMmQ4YmM3NjgtNTExNC00ZTZhLWEwZTctYjdhOWI4ZWFlMDk2XkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_FMjpg_UX1000_.jpg",
+            trailer: "https://www.youtube.com/embed/Q1NKMPhP8PY",timings: ["10:30 AM", "2:30 PM", "6:30 PM"]},
+            {id: 4,title: "Baahubali: The Beginning",price: 280,category: "tollywood",rating: 4.7,image: "https://m.media-amazon.com/images/M/MV5BYWVlMjVhZWYtNWViNC00ODFkLTk1MmItYjU1MDY5ZDdhMTU3XkEyXkFqcGdeQXVyODIwMDI1NjM@._V1_.jpg",
+            trailer: "https://www.youtube.com/embed/sOEg_YZQsTI",timings: ["11:30 AM", "3:30 PM", "7:30 PM"]},
+            {id: 6,title: "Munjya",price: 240,category: "bollywood", rating: 4.4,image: "https://upload.wikimedia.org/wikipedia/en/3/39/Munjya_2024.jpg",
+            trailer: "https://www.youtube.com/embed/qGb5aKEYR8Q",timings: ["10:30 AM", "2:30 PM", "6:30 PM"]},
+            {id: 7,title: "Singham",price: 240,category: "bollywood", rating: 4.4,
+                image: "https://m.media-amazon.com/images/M/MV5BMjQzZDExZDEtYjAxYy00ZGVhLWE4YWItNTVkZjA5ZjVjZWM3XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+                trailer: "https://www.youtube.com/embed/MD7v0-igVIM",timings: ["10:30 AM", "2:30 PM", "6:30 PM"]
+                },{ id: 8,title: "Stree 2",price: 270,category: "bollywood",rating: 4.0,
+                image: "https://m.media-amazon.com/images/M/MV5BMTA1NmUxYzItZmVmNy00YmQxLTk4Y2UtZjVkMWUwMWQ5N2IxXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+                trailer: "https://www.youtube.com/embed/KVnheXywIbY",timings: ["11:30 AM", "3:30 PM", "7:30 PM"] },
+                {id: 1,title: "Zootopia",price: 200,category: "cartoon",rating: 4.5,image: "https://i.pinimg.com/originals/b7/24/d9/b724d968025c6cda0580ccfa1541a89a.png",
+                 trailer: "https://www.youtube.com/embed/yCOPJi0Urq4",timings: ["10:00 AM", "2:00 PM", "6:00 PM"]},
+                { id: 9,title: "Fighter",price: 270,category: "bollywood",rating: 4.0,
+                image: "https://upload.wikimedia.org/wikipedia/en/d/df/Fighter_film_teaser.jpg",
+                trailer: "https://www.youtube.com/embed/6amIq_mP4xM",timings: ["11:30 AM", "3:30 PM", "7:30 PM"] },
+                { id: 10,title: "Bhool Bhulaiyaa",price: 270,category: "bollywood",rating: 4.0,
+                image: "https://upload.wikimedia.org/wikipedia/en/e/e4/Bhool_Bhulaiyaa_3_poster.jpg",
+                trailer: "https://www.youtube.com/embed/fqc364gMbxI",timings: ["11:30 AM", "3:30 PM", "7:30 PM"] },
+                { id: 10,title: "Bad Newz",price: 270,category: "bollywood",rating: 4.0,
+                image: "https://m.media-amazon.com/images/M/MV5BM2QxNGM0OTItMjE1MS00ZjRiLTg3ZTItMTg1NGMyNmRiMjc4XkEyXkFqcGc@._V1_.jpg",
+                trailer: "https://www.youtube.com/embed/yG_XYjb9dJ8",timings: ["12:00 PM", "4:00 PM", "8:00 PM"] },
+                { id: 11,title: "Ulajh",price: 270,category: "bollywood",rating: 4.2,
+                image: "https://upload.wikimedia.org/wikipedia/en/4/45/Ulajh_Poster.jpg",
+                trailer: "https://www.youtube.com/embed/Tk1EQD7vGiY",timings: ["11:30 AM", "3:30 PM", "7:30 PM"] },
+                {id: 5,title: "Pathaan",price: 250,category: "bollywood",rating: 4.3,
+                image: "https://m.media-amazon.com/images/M/MV5BM2QzM2JiNTMtYjU4Ny00MDZkLTk3MmUtYTRjMzVkZGJlNmYyXkEyXkFqcGdeQXVyMTUzNTgzNzM0._V1_.jpg",
+                trailer: "https://www.youtube.com/embed/vqu4z34wENw",timings: ["10:00 AM", "2:00 PM", "6:00 PM"]},
+                { id: 29, title: "The Conjuring", price: 280, category: "hollywood", rating: 4.5,
+                image: "https://m.media-amazon.com/images/M/MV5BMTM3NjA1NDMyMV5BMl5BanBnXkFtZTcwMDQzNDMzOQ@@._V1_.jpg",
+                    trailer: "https://www.youtube.com/embed/k10ETZ41q5o", timings: ["10:30 AM", "2:30 PM", "6:30 PM"] },
+                { id: 30, title: "A Quiet Place", price: 290, category: "hollywood", rating: 4.6, 
+                        image: "https://m.media-amazon.com/images/M/MV5BMjI0MDMzNTQ0M15BMl5BanBnXkFtZTgwMTM5NzM3NDM@._V1_.jpg",
+                        trailer: "https://www.youtube.com/embed/WR7cc5t7tv8", timings: ["11:00 AM", "3:00 PM", "7:00 PM"] },
+                { id: 31, title: "The Nun", price: 270, category: "hollywood", rating: 4.3,
+                        image: "https://m.media-amazon.com/images/M/MV5BMjM3NzQ5NDcxOF5BMl5BanBnXkFtZTgwNzM4MTQ5NTM@._V1_.jpg", 
+                        trailer: "https://www.youtube.com/embed/pzD9zGcUNrw", timings: ["11:30 AM", "3:30 PM", "7:30 PM"] },
+                { id: 32, title: "Insidious", price: 260, category: "hollywood", rating: 4.4,
+                        image: "https://m.media-amazon.com/images/M/MV5BMTYyOTAxMDA0OF5BMl5BanBnXkFtZTcwNzgwNTc1NA@@._V1_.jpg",
+                        trailer: "https://www.youtube.com/embed/zuZnRUcoWos", timings: ["10:00 AM", "2:00 PM", "6:00 PM"] },
+                { id: 33, title: "The Exorcist", price: 300, category: "hollywood", rating: 4.8,
+                        image: "https://m.media-amazon.com/images/M/MV5BYjhmMGMxZDYtMTkyNy00YWVmLTgyYmUtYTU3ZjcwNTBjN2I1XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg",
+                        trailer: "https://www.youtube.com/embed/YDGw1MTEe9k", timings: ["11:00 AM", "3:00 PM", "7:00 PM"] },
+                { id: 34, title: "Annabelle", price: 280, category: "hollywood", rating: 4.4,
+                        image: "https://m.media-amazon.com/images/M/MV5BOTQwZmQyYzEtODk5ZC00OTY3LWExMjAtYzRjNWFhNGM3MzBlXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_.jpg",
+                        trailer: "https://www.youtube.com/embed/paFgQNPGlsg", timings: ["10:30 AM", "2:30 PM", "6:30 PM"] },
+                { id: 18, title: "Deadpool 3", price: 300, category: "hollywood", rating: 4.8,
+                image: "https://wallpapers.com/images/hd/deadpool-3-movie-poster-portals-rp2oz393eex7vrgu.jpg",
+                trailer: "https://www.youtube.com/embed/uJMCNJP2ipI", timings: ["10:30 AM", "2:30 PM", "6:30 PM"] },
+                { id: 19, title: "Madame Web", price: 290, category: "hollywood", rating: 4.5,
+                image: "https://image.tmdb.org/t/p/original/A9Bd1yoTEA4jmHawjkM07jRc9xE.jpg",
+                trailer: "https://www.youtube.com/embed/s_76M4c4LTo", timings: ["11:00 AM", "3:00 PM", "7:00 PM"] },
+                { id: 20, title: "Dune: Part Two", price: 310, category: "hollywood", rating: 4.7,
+                image: "https://m.media-amazon.com/images/M/MV5BNTc0YmQxMjEtODI5MC00NjFiLTlkMWUtOGQ5NjFmYWUyZGJhXkEyXkFqcGc@._V1_.jpg",
+                trailer: "https://www.youtube.com/embed/Way9Dexny3w", timings: ["11:30 AM", "3:30 PM", "7:30 PM"] },
+                { id: 21, title: "Spider-Man: No Way Home", price: 280, category: "hollywood", rating: 4.3,
+                image: "https://images-cdn.ubuy.co.in/6502d8fad41d96757f66f08e-hukobj-superhero-spiderman-no-way-home.jpg",
+                trailer: "https://www.youtube.com/embed/JfVOs4VSpmA", timings: ["10:00 AM", "2:00 PM", "6:00 PM"] },
+                { id: 22, title: "Godzilla x Kong", price: 300, category: "hollywood", rating: 4.6,
+                image: "https://image.tmdb.org/t/p/original/z1p34vh7dEOnLDmyCrlUVLuoDzd.jpg",
+                trailer: "https://www.youtube.com/embed/odM92ap8_c0", timings: ["11:00 AM", "3:00 PM", "7:00 PM"] }
+            ,{ id: 23, title: "Frozen -2", price: 250, category: "cartoon", rating: 4.8,
+                image: "https://lumiere-a.akamaihd.net/v1/images/p_frozen2_19644_4c4b423d.jpeg?region=0%2C0%2C540%2C810",
+                trailer: "https://www.youtube.com/embed/eSLe4HuKuK0", timings: ["10:00 AM", "2:00 PM", "6:00 PM"] },
+            { id: 24, title: "Moana", price: 250, category: "cartoon", rating: 4.7,
+                image: "https://m.media-amazon.com/images/M/MV5BMjI4MzU5NTExNF5BMl5BanBnXkFtZTgwNzY1MTEwMDI@._V1_.jpg", 
+                trailer: "https://www.youtube.com/embed/LKFuXETZUsI", timings: ["11:30 AM", "3:30 PM", "7:30 PM"] },
+            { id: 25, title: "Toy Story 4", price: 260, category: "cartoon", rating: 4.6,
+                image: "https://m.media-amazon.com/images/M/MV5BMTYzMDM4NzkxOV5BMl5BanBnXkFtZTgwNzM1Mzg2NzM@._V1_.jpg",
+                trailer: "https://www.youtube.com/embed/wmiIUN-7qhE", timings: ["10:30 AM", "2:30 PM", "6:30 PM"] },
+            { id: 26, title: "Inside Out", price: 240, category: "cartoon", rating: 4.9,
+                image: "https://m.media-amazon.com/images/M/MV5BOTgxMDQwMDk0OF5BMl5BanBnXkFtZTgwNjU5OTg2NDE@._V1_.jpg",
+                trailer: "https://www.youtube.com/embed/yRUAzGQ3nSY", timings: ["11:00 AM", "3:00 PM", "7:00 PM"] },
+            { id: 28, title: "How to Train Your Dragon", price: 250, category: "cartoon", rating: 4.8,
+                image: "https://m.media-amazon.com/images/M/MV5BMjA5NDQyMjc2NF5BMl5BanBnXkFtZTcwMjg5ODcyMw@@._V1_.jpg",
+                trailer: "https://www.youtube.com/embed/oKiYuIsPxYk", timings: ["11:30 AM", "3:30 PM", "7:30 PM"] },
+        { id: 35, title: "Iron Man 3", price: 290, category: "hollywood", rating: 4.7,
+                image: "https://m.media-amazon.com/images/M/MV5BMjE5MzcyNjk1M15BMl5BanBnXkFtZTcwMjQ4MjcxOQ@@._V1_.jpg",
+                trailer: "https://www.youtube.com/embed/Ke1Y3P9D0Bc", timings: ["10:00 AM", "2:00 PM", "6:00 PM"] },
+        { id: 36, title: "Avengers: Endgame", price: 320, category: "hollywood", rating: 4.9,
+                image: "https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_.jpg",
+                trailer: "https://www.youtube.com/embed/TcMBFSGVi1c", timings: ["10:30 AM", "2:30 PM", "6:30 PM"] },
+        { id: 37, title: "Immaculate", price: 290, category: "hollywood", rating: 4.6,
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGtEXssyIyIxgUBOrjsH55mGzBUzC94C7YPA&s",
+                trailer: "https://www.youtube.com/embed/MACU-2pqVOI", timings: ["11:00 AM", "3:00 PM", "7:00 PM"] },
+        { id: 38, title: "Trap", price: 280, category: "hollywood", rating: 4.5,
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwo41J4W2Bqsv0-q31VZ44Wa7uuNRr3Fv5gA&s",
+                trailer: "https://www.youtube.com/embed/hJiPAJKjUVg", timings: ["10:30 AM", "2:30 PM", "6:30 PM"] },
+        { id: 39, title: "Venom: The Last Dance", price: 300, category: "hollywood", rating: 4.7,
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNF1vBa0lTDEUXKoeBv7IYmBBOhuol3felwA&s",
+                trailer: "https://www.youtube.com/embed/HyIyd9joTTc", timings: ["11:00 AM", "3:00 PM", "7:00 PM"] },
+        { id: 40, title: "Bahubali 2", price: 200, category: "tollywood", rating: 4.7,
+                image: "https://upload.wikimedia.org/wikipedia/en/9/93/Baahubali_2_The_Conclusion_poster.jpg",
+                trailer: "https://www.youtube.com/watch?v=qD-6d8Wo3do", timings: ["11:00 AM", "3:00 PM", "7:00 PM"] },
+                
+        
+        
+
+
+        ];
+
+        // Initialize page
+        function initializePage() {
+            loadMovies('all');
+            setupEventListeners();
+        }
+
+        // Load movies based on category
+        function loadMovies(category) {
+            const container = document.getElementById('movies-container');
+            container.innerHTML = '';
+
+            const filteredMovies = category === 'all' 
+                ? movies 
+                : movies.filter(movie => movie.category === category);
+
+            filteredMovies.forEach(movie => {
+                const movieElement = createMovieElement(movie);
+                container.appendChild(movieElement);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            const categoryLinks = document.querySelectorAll('.nav-links a');
+            categoryLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    categoryLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                    const category = link.getAttribute('onclick').match(/'([^']+)'/)[1];
+                    loadMovies(category);
+                });
+            });
+        }
+
+        // Create movie element
+        function createMovieElement(movie) {
+            const div = document.createElement('div');
+            div.className = 'movie';
+            div.innerHTML = `
+                <img src="${movie.image}" alt="${movie.title}" onerror="this.src='placeholder.jpg'">
+                <div class="movie-info">
+                    <h3>${movie.title}</h3>
+                    <div class="movie-rating">
+                        ${getStarRating(movie.rating)}
+                    </div>
+                    <div class="movie-buttons">
+                        <button onclick="startBooking(${movie.id})" class="book-btn">
+                            Book Now
+                        </button>
+                        <button onclick="playTrailer('${movie.trailer}')" class="trailer-btn">
+                            Trailer
+                        </button>
+                    </div>
+                </div>
+            `;
+            return div;
+        }
+
+        // Generate star rating
+        function getStarRating(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 !== 0;
+            let stars = '';
+            
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i class="fas fa-star"></i>';
+            }
+            if (hasHalfStar) {
+                stars += '<i class="fas fa-star-half-alt"></i>';
+            }
+            return stars;
+        }
+
+        // Search movies
+        function searchMovies(searchTerm) {
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector('.nav-links a[onclick="filterMovies(\'all\')"]').classList.add('active');
+            
+            const container = document.getElementById('movies-container');
+            container.innerHTML = '';
+            
+            if (!searchTerm.trim()) {
+                loadMovies('all');
+                return;
+            }
+            
+            const filteredMovies = movies.filter(movie => 
+                movie.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                movie.category.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            if (filteredMovies.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 20px;">
+                        <h3>No movies found matching "${searchTerm}"</h3>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredMovies.forEach(movie => {
+                const movieElement = createMovieElement(movie);
+                container.appendChild(movieElement);
+            });
+        }
+
+        // Booking functions
+        function startBooking(movieId) {
+            const movie = movies.find(m => m.id === movieId);
+            if (!movie) return;
+
+            document.getElementById('selected-movie-title').textContent = movie.title;
+            document.getElementById('ticket-price').textContent = movie.price;
+            
+            loadShowTimings(movie.timings);
+            initializeSeatLayout();
+            
+            // Show booking section
+            document.getElementById('movies-container').style.display = 'none';
+            document.getElementById('booking-section').style.display = 'block';
+            
+            // Hide header elements in booking section
+            document.querySelector('.search-container').style.display = 'none';
+            document.querySelector('.nav-links').style.display = 'none';
+        }
+
+        // Load show timings
+        function loadShowTimings(timings) {
+            const container = document.getElementById('timings-container');
+            container.innerHTML = timings.map(time => `
+                <button onclick="selectTiming(this)" class="timing-btn">
+                    ${time}
+                </button>
+            `).join('');
+        }
+
+        function selectTiming(button) {
+            document.querySelectorAll('.timing-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            button.classList.add('selected');
+        }
+
+        function initializeSeatLayout() {
+            const layout = document.getElementById('seat-layout');
+            layout.innerHTML = '';
+            
+            for (let i = 0; i < 32; i++) {
+                const seat = document.createElement('div');
+                seat.className = 'seat';
+                seat.onclick = () => toggleSeat(seat);
+                layout.appendChild(seat);
+            }
+        }
+
+        function toggleSeat(seat) {
+            if (seat.classList.contains('occupied')) return;
+            seat.classList.toggle('selected');
+            updateBookingSummary();
+        }
+
+        function updateBookingSummary() {
+            const selectedSeats = document.querySelectorAll('.seat.selected').length;
+            const price = parseInt(document.getElementById('ticket-price').textContent);
+            let totalAmount = selectedSeats * price;
+            
+            // Apply 20% discount if more than 3 seats are selected
+            if (selectedSeats > 3) {
+                discountAmount = totalAmount * 0.1; // 20% discount
+            }
+            
+            document.getElementById('selected-seats').textContent = selectedSeats;
+            document.getElementById('subtotal-amount').textContent = selectedSeats * price;
+            document.getElementById('bulk-discount-amount').textContent=discountAmount;
+            document.getElementById('total-amount').textContent = totalAmount-discountAmount;
+        }
+
+        // Confirm booking
+        function confirmBooking() {
+            const selectedTime = document.querySelector('.timing-btn.selected');
+            if (!selectedTime) {
+                alert('Please select a show time');
+                return;
+            }
+
+            const selectedSeats = document.querySelectorAll('.seat.selected').length;
+            if (selectedSeats === 0) {
+                alert('Please select at least one seat');
+                return;
+            }
+
+            const movieTitle = document.getElementById('selected-movie-title').textContent;
+            const totalAmount = document.getElementById('total-amount').textContent;
+
+            // Update confirmation section
+            document.getElementById('confirm-movie').textContent = movieTitle;
+            document.getElementById('confirm-time').textContent = selectedTime.textContent;
+            document.getElementById('confirm-seats').textContent = selectedSeats;
+            document.getElementById('confirm-amount').textContent = totalAmount;
+
+            // Show confirmation section
+            document.getElementById('booking-section').style.display = 'none';
+            document.getElementById('confirmation-section').style.display = 'block';
+        }
+
+        function goBack(section) {
+            if (section === 'booking') {
+                document.getElementById('booking-section').style.display = 'none';
+                document.getElementById('movies-container').style.display = 'grid';
+                document.querySelector('.search-container').style.display = 'block';
+                document.querySelector('.nav-links').style.display = 'flex';
+                
+                document.querySelectorAll('.seat.selected').forEach(seat => {
+                    seat.classList.remove('selected');
+                });
+                document.querySelectorAll('.timing-btn.selected').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+            } else if (section === 'confirmation') {
+                document.getElementById('confirmation-section').style.display = 'none';
+                document.getElementById('movies-container').style.display = 'grid';
+                document.querySelector('.search-container').style.display = 'block';
+                document.querySelector('.nav-links').style.display = 'flex';
+            }
+        }
+
+        // Trailer functions
+        function playTrailer(trailerUrl) {
+            document.getElementById('trailer-frame').src = trailerUrl;
+            document.getElementById('trailer-modal').style.display = 'flex';
+        }
+
+        function closeTrailer() {
+            document.getElementById('trailer-modal').style.display = 'none';
+            document.getElementById('trailer-frame').src = '';
+        }
+
+        // Initialize page when loaded
+        window.onload = initializePage;
+    </script>
+</body>
+</html>
